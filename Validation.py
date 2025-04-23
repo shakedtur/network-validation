@@ -13,18 +13,25 @@ class Validator:
 
     #TODO add color to messgages
     #TODO add counter summery
-    def analyze_packets(self):
+    def analyze_packets(self,report_file):
+        ip_counter=Counter()
         #adding time sign to file report
-        with open(REPORT_FILE_PATH, "a", encoding="utf-8") as f:
+        with open(report_file, "a", encoding="utf-8") as f:
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             f.write(f"\n=== Report started at {timestamp} ===\n")
 
         for pack in self.packest_list:
             block_flag=self.packet_blocked_check(pack)
-            if not block_flag:
+            if block_flag:
+                self.update_counter(ip_counter,pack,"block")
+            else:
                 allow_flag=self.packet_allow_check(pack)
+                if allow_flag:
+                    self.update_counter(ip_counter,pack,"valid")
             if not block_flag and not allow_flag:
                 self.print_invalid_message(pack)
+                self.update_counter(ip_counter,pack,"invalid")
+        print(ip_counter)
 #
 
     def packet_blocked_check(self,pack):
@@ -67,6 +74,23 @@ class Validator:
         with open(file_path, "a", encoding="utf-8") as f:
             f.write(message)
 
-    def update_counter(self,counter,pack,flag):
-        pass
+    def update_counter(self,counter,pack,status):
+        if status == "invalid":
+            counter.update("invalid")
+            return True
+
+        if status == "valid":
+            if pack.protocol =='TCP':
+                counter.update("allow_TCP")
+            elif pack.protocol == 'UDP':
+                counter.update('allow_UDP')
+            return True
+
+        elif status == "block":
+            if pack.protocol == 'TCP':
+                counter.update("block_TCP")
+            elif pack.protocol == 'UDP':
+                counter.update('block_UDP')
+            return True
+
 
