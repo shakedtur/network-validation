@@ -15,7 +15,7 @@ def read_packets(packets):
         num=i+1
         flag_protocol= True
         # כתובת מקור ויעד (אם זו מנה מסוג IP)
-        #TODO- add ignore ARP PACKETS
+        #TODO- add ignore ARP ICMP IPV6 PACKETS
         if packet.haslayer("IP"):
             print(f"From: {packet['IP'].src} --> To: {packet['IP'].dst}")
             src_ip_packet=packet['IP'].src
