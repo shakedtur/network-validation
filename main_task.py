@@ -5,13 +5,16 @@ from scapy.all import rdpcap,IP, TCP, UDP
 from IP_Packet import IP_Packet, IP_Packet_Ports
 import Policy
 import Validation
+from analyze_summery import Counter
+PCAP_FILE = 'traffic.pcap'
+JSON_FILE = "policy.json"
 
 def read_packets(packets):
     """return list of just IPV4 of UDP and TCP type packets"""
     packets_list=[]
     print(packets)
-    for i, packet in enumerate(packets):
 
+    for i, packet in enumerate(packets):
         num=i+1
         flag_protocol= True
         # כתובת מקור ויעד (אם זו מנה מסוג IP)
@@ -38,18 +41,19 @@ def read_packets(packets):
     return packets_list
 
 def main():
-    pcap_file_name='traffic.pcap'
-    json_file= "policy.json"
 
-    packets = rdpcap(pcap_file_name)
+
+    packets = rdpcap(PCAP_FILE)
     # מדפיס את מספר המנות בקובץ
     print(f"Total packets: {len(packets)}")
 
     filterd_packets_list=read_packets(packets)
-    for i in filterd_packets_list:
-        print(i)
+
+
+    # for i in filterd_packets_list:
+    #     print(i)
     print(f"len of filterd_packets_list = {len(filterd_packets_list)}")
-    policy_rules=Policy.from_json_file(json_file)
+    policy_rules=Policy.from_json_file(JSON_FILE)
     policy_rules.display_policy()
 
     print("valiatinnnnnnn")
