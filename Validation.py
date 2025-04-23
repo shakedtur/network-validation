@@ -52,13 +52,13 @@ class Validator:
 
     def print_message_2_file(self, pack, status, file_path= REPORT_FILE_PATH):
         if status == "valid":
-            message = f"Packet #{pack.packet_num} : ✅ VALID - {pack.protocol} flow from {pack.source_ip} to {pack.destination_ip}:{pack.destination_port}\n"
+            message = f"Packet #{pack.packet_num}: ✅ valid {pack.protocol} flow from {pack.source_ip} to {pack.destination_ip} : {pack.destination_port} \n"
 
         elif status == "block":
-            message = f"Packet #{pack.packet_num} : ❌ BLOCKED - {pack.protocol} flow from {pack.source_ip} to {pack.destination_ip}:{pack.destination_port}\n"
+            message = f"Packet #{pack.packet_num}: ❌ Blocked , source IP {pack.source_ip} is in blocked sources list\n"
 
         elif status == "invalid":
-            message = f"Packet #{pack.packet_num} : ⚠️ Invalid - no matching allowed route for {pack.protocol} flow from {pack.source_ip} to {pack.destination_ip}:{pack.destination_port}\n"
+            message = f"Packet #{pack.packet_num}:⚠️Invalid- no matching allowed route for  {pack.protocol} flow from {pack.source_ip} to {pack.destination_ip} : {pack.destination_port} \n"
 
         else:
             message = f"Packet #{pack.packet_num} : Unknown status '{status}'\n"

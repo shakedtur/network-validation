@@ -9,10 +9,9 @@ from analyze_summery import Counter
 PCAP_FILE = 'traffic.pcap'
 JSON_FILE = "policy.json"
 
-def read_packets(packets):
+def filter_packets(packets):
     """return list of just IPV4 of UDP and TCP type packets"""
     packets_list=[]
-    print(packets)
 
     for i, packet in enumerate(packets):
         num=i+1
@@ -38,25 +37,29 @@ def read_packets(packets):
             if flag_protocol:
                 temp_pack=IP_Packet_Ports(num,src_ip_packet,dst_ip_packet,protocol_type,src_port,dst_port)
                 packets_list.append(temp_pack)
+    print(f"Total packets read: {len(packets)}")
     return packets_list
+
+
+def read_packets_from_PCAP_file(filename):
+    packets_data = rdpcap(filename)
+    print(packets_data)
+    return packets_data
+
+
 
 def main():
 
 
-    packets = rdpcap(PCAP_FILE)
-    # מדפיס את מספר המנות בקובץ
-    print(f"Total packets: {len(packets)}")
+    packets = read_packets_from_PCAP_file(PCAP_FILE)
 
-    filterd_packets_list=read_packets(packets)
+    filterd_packets_list=filter_packets(packets)
 
-
-    # for i in filterd_packets_list:
-    #     print(i)
     print(f"len of filterd_packets_list = {len(filterd_packets_list)}")
     policy_rules=Policy.from_json_file(JSON_FILE)
     policy_rules.display_policy()
 
-    print("valiatinnnnnnn")
+    print("valiadtion")
     V=Validation.Validator(policy_rules,filterd_packets_list).analyze_packets()
 
 main()
