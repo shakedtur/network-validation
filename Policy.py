@@ -4,7 +4,7 @@ import json
 from IPAdress import IP
 
 class Policy:
-    def __init__(self, blocked_sources, allowed_routes):
+    def __init__(self, blocked_sources=[], allowed_routes={}):
         self.blocked_sources = self.convert_stringIP(blocked_sources)
         self.allowed_routes = self.convert_stringIP(allowed_routes)
 

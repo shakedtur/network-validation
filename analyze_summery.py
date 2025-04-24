@@ -9,7 +9,6 @@ class Counter:
         return cls._instance
 
     def __init__(self):
-        # verify just one object exist
         if self._initialized:
             return
         self.allow_TCP = 0
@@ -20,17 +19,22 @@ class Counter:
         self.invalid = 0
         self.ignore_packets = 0
         self.total = 0
+        self.seen_packets = set()  # <-- נשמור את המספרים של הפקטות
         self._initialized = True
 
-    def update(self, packet_type):
+    def update(self, packet_type, packet_num):
+        if packet_num in self.seen_packets:
+            print(f"Packet #{packet_num} already counted, skipping.")
+            return
         if not hasattr(self, packet_type):
             raise ValueError(f"Unknown packet type: {packet_type}")
         setattr(self, packet_type, getattr(self, packet_type) + 1)
         self.total += 1
+        self.seen_packets.add(packet_num)
 
     def __repr__(self):
         return (
-            f"allow_TCP: {self.allow_TCP}, block_TCP: {self.block_TCP}, "
-            f"allow_UDP: {self.allow_UDP}, block_UDP: {self.block_UDP}, "
+            f"Authorized TCP: {self.allow_TCP}, blocked TCP: {self.block_TCP}, "
+            f"Authorized UDP: {self.allow_UDP}, blocked UDP: {self.block_UDP}, "
             f"invalid packets: {self.invalid} IPv6: {self.IPv6}, ignore_packets: {self.ignore_packets}, total: {self.total}"
         )

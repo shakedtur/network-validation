@@ -10,7 +10,7 @@ class IP_Packet:
         self.protocol = protocol
         self.length = length
         self.data = data
-        self.tag= "Untag"
+        self.tag= None
     # TODO add src/ des port number
 
     def display_info(self):

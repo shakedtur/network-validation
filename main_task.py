@@ -9,6 +9,7 @@ from analyze_summery import Counter
 PCAP_FILE = 'traffic.pcap'
 JSON_FILE = "policy.json"
 REPORT_FILE_PATH = 'report.txt'
+
 def filter_packets(packets,count):
     """return list of just IPV4 of UDP and TCP type packets"""
     packets_list=[]
@@ -40,10 +41,9 @@ def filter_packets(packets,count):
         else:
             #TODO add to counter summery
             if IPv6 in packet:
-                count.update("IPv6")
+                count.update("IPv6",num)
             else:
-                count.update("ignore_packets")
-
+                count.update("ignore_packets",num)
 
     print(f"Total packets read: {len(packets)}")
     return packets_list

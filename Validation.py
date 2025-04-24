@@ -15,11 +15,13 @@ class Validator:
     #TODO add counter summery
     def analyze_packets(self,report_file):
         ip_counter=Counter()
-        #adding time sign to file report
-        with open(report_file, "a", encoding="utf-8") as f:
-            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            f.write(f"\n=== Report started at {timestamp} ===\n")
 
+        #adding time sign to file report
+        self.time_sign_to_file(REPORT_FILE_PATH)
+        self.analyze_packets_flow()
+        print(ip_counter)
+
+    def analyze_packets_flow(self,ip_counter=Counter()):
         for pack in self.packest_list:
             block_flag=self.packet_blocked_check(pack)
             if block_flag:
@@ -31,8 +33,12 @@ class Validator:
             if not block_flag and not allow_flag:
                 self.print_invalid_message(pack)
                 self.update_counter(ip_counter,pack,"invalid")
-        print(ip_counter)
-#
+
+    def time_sign_to_file(self,report_file):
+
+        with open(report_file, "a", encoding="utf-8") as f:
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            f.write(f"\n=== Report started at {timestamp} ===\n")
 
     def packet_blocked_check(self,pack):
         if pack.source_ip in self.policy.blocked_sources:
@@ -41,19 +47,21 @@ class Validator:
             print(f"-Packet #{pack.packet_num}: Blocked , source IP {pack.source_ip} is in blocked sources list")
             self.print_message_2_file(pack,"block")
             return True
-
-        return False
+        else:
+            return False
 
     def packet_allow_check(self,pack):
-        for role in self.policy.allowed_routes:
-            if pack.source_ip == role['src_ip'] and pack.destination_ip == role['dst_ip'] and pack.protocol== role['protocol'] and pack.destination_port == role['dst_port'] :
+        for rule in self.policy.allowed_routes:
+            if pack.source_ip == rule['src_ip'] and pack.destination_ip == rule['dst_ip'] and pack.protocol== rule['protocol'] and pack.destination_port == rule['dst_port'] :
                 pack.tag="Valid"
                 print(f"Packet #{pack.packet_num} : valid {pack.protocol} flow from {pack.source_ip} to {pack.destination_ip} : {pack.destination_port} ")
                 self.print_message_2_file(pack,"valid")
                 return True
+        pack.tag= "Invalid"
         return False
 
     def print_invalid_message(self, pack):
+
         print(f"Packet #{pack.packet_num} : Invalid- no matching allowed route for  {pack.protocol} flow from {pack.source_ip} to {pack.destination_ip} : {pack.destination_port} ")
         self.print_message_2_file(pack,"invalid")
 
@@ -76,21 +84,21 @@ class Validator:
 
     def update_counter(self,counter,pack,status):
         if status == "invalid":
-            counter.update("invalid")
+            counter.update("invalid",pack.packet_num)
             return True
 
         if status == "valid":
             if pack.protocol =='TCP':
-                counter.update("allow_TCP")
+                counter.update("allow_TCP",pack.packet_num)
             elif pack.protocol == 'UDP':
-                counter.update('allow_UDP')
+                counter.update('allow_UDP',pack.packet_num)
             return True
 
         elif status == "block":
             if pack.protocol == 'TCP':
-                counter.update("block_TCP")
+                counter.update("block_TCP",pack.packet_num)
             elif pack.protocol == 'UDP':
-                counter.update('block_UDP')
+                counter.update('block_UDP',pack.packet_num)
             return True
 
 
