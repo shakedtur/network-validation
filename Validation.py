@@ -26,10 +26,12 @@ class Validator:
             block_flag=self.packet_blocked_check(pack)
             if block_flag:
                 self.update_counter(ip_counter,pack,"block")
+                self.print_message_2_file(pack, "block")
             else:
                 allow_flag=self.packet_allow_check(pack)
                 if allow_flag:
                     self.update_counter(ip_counter,pack,"valid")
+                    self.print_message_2_file(pack, "valid")
             if not block_flag and not allow_flag:
                 self.print_invalid_message(pack)
                 self.update_counter(ip_counter,pack,"invalid")
@@ -45,7 +47,6 @@ class Validator:
             # TODO add flag of block packet
             pack.tag= "Block"
             print(f"-Packet #{pack.packet_num}: Blocked , source IP {pack.source_ip} is in blocked sources list")
-            self.print_message_2_file(pack,"block")
             return True
         else:
             return False
@@ -55,7 +56,6 @@ class Validator:
             if pack.source_ip == rule['src_ip'] and pack.destination_ip == rule['dst_ip'] and pack.protocol== rule['protocol'] and pack.destination_port == rule['dst_port'] :
                 pack.tag="Valid"
                 print(f"Packet #{pack.packet_num} : valid {pack.protocol} flow from {pack.source_ip} to {pack.destination_ip} : {pack.destination_port} ")
-                self.print_message_2_file(pack,"valid")
                 return True
         pack.tag= "Invalid"
         return False
